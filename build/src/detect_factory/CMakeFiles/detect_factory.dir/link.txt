@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../lib/libdetect_factory.a  CMakeFiles/detect_factory.dir/armor_info.cpp.o CMakeFiles/detect_factory.dir/armor_detect.cpp.o
+/usr/bin/ranlib ../../lib/libdetect_factory.a

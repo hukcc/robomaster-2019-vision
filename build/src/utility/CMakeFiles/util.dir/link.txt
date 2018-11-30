@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../lib/libutil.a  CMakeFiles/util.dir/debug_utility.cpp.o CMakeFiles/util.dir/video_recoder.cpp.o
+/usr/bin/ranlib ../../lib/libutil.a
