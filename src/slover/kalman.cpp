@@ -1,7 +1,18 @@
 #include "slover/kalman.hpp"
-
+#include <cmath>
+#include <vector>
+#include <opencv2/opencv.hpp>
+#include "opencv2/features2d.hpp"
 using namespace cv;
+using namespace std;
 
+float history_vx=0;
+int his_flag=0;
+Mat history_mat;
+vector<Mat> history_mats(2);
+Mat match_mat(640-3+1,480-3+1,CV_32FC1);
+double minv,maxv;
+Point minpoint,maxpoint;
 void CKalman() {};
 
 Point2f oldpoint = Point2f(0,0);
@@ -16,8 +27,52 @@ static inline Point calcPoint(Point2f center, double  x, double  y,int K = 1)
 //float x=250,y=250,vx=1,vy=-1;
 
 
-Point2f CKalman(Point2f & point4kalman , Mat & img ,Point2f & oldPoint4Kalman )
+Point2f CKalman(Point2f & point4kalman , Mat & img ,Point2f & oldPoint4Kalman , int & predict_count , int & dis)
 {
+
+    if(his_flag<0){
+        
+    imshow("img",img);
+    //waitKey(0);
+    Rect roi(319,25,30,30);
+    rectangle(img,roi,Scalar(255,0,0));
+    history_mat = history_mats[(his_flag-1)%2];
+    Mat tempmat = history_mat(roi);
+    imshow("his",history_mat);
+//////////////////////////////////////////////////////////////////////////////////
+    
+///////////////////////////////////////surf///////////////////////////////////////
+    /*
+    cvtColor(history_mat,history_mat,COLOR_RGB2GRAY);
+    vector<KeyPoint> train_keypoint;
+    Mat train_descriptor;
+    */
+    
+    
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+    matchTemplate(img,tempmat,match_mat,TM_CCOEFF_NORMED);
+    normalize(match_mat,match_mat,0,1,NORM_MINMAX,-1,Mat());
+    
+    cv::minMaxLoc(match_mat,&minv,&maxv,&minpoint,&maxpoint);
+
+    Point2f matchpoint = maxpoint;
+    circle(img,matchpoint,10,Scalar(0,0,255));
+    line(match_mat,matchpoint,Point2f(320,76),Scalar(0,0,255));
+    
+    printf("%lf\n",matchpoint.x-319);
+    imshow("",match_mat);
+    waitKey(0);
+    
+    //FLANN特征点匹配
+    
+    
+    
+    }
     
     //Mat img(500, 500, CV_8UC3);     //定义背景图像
     
@@ -30,13 +85,13 @@ Point2f CKalman(Point2f & point4kalman , Mat & img ,Point2f & oldPoint4Kalman )
     //初始化运动状态
     float x = point4kalman.x;
     float y = point4kalman.y;
-    float vx = -(oldPoint4Kalman.x - point4kalman.x);
-    float vy = -(oldPoint4Kalman.y - point4kalman.y);
+    float vx = -(oldPoint4Kalman.x - point4kalman.x)*4450/dis;
+    float vy = -(oldPoint4Kalman.y - point4kalman.y)*4450/dis;
 
     state.at<float>(0) = x;
     state.at<float>(1) = y;
-    state.at<float>(2) = vx*1.1;
-    state.at<float>(3) = vy*1.1;
+    state.at<float>(2) = vx;
+    state.at<float>(3) = vy;
 
 
     //for(;;)
@@ -68,10 +123,14 @@ Point2f CKalman(Point2f & point4kalman , Mat & img ,Point2f & oldPoint4Kalman )
         //以上是初始化 每一次测量和估计开始前都要重新初始化
         
         //Point2f point_into = Point2f(1500,1500) ;
-        for(int i=0;i<3 ;i++) //内层for循环表示对于当前这一帧的图像开始进行测量
+        //for(int i=0;i<3 ;i++) //内层for循环表示对于当前这一帧的图像开始进行测量
         
-        {
+        //{
+
+            
+
             Point2f center(img.cols*0.5f, img.rows*0.5f);   //定义出图像的中心点
+            circle(img,center,2,Scalar(0,255,0));
             //float R = img.cols/3.f;     //声明圆的半径
             //double x = x;
             //double y = y;
@@ -100,6 +159,7 @@ Point2f CKalman(Point2f & point4kalman , Mat & img ,Point2f & oldPoint4Kalman )
                 line( img, Point( center.x + d, center.y - d ),                          \
                              Point( center.x - d, center.y + d ), color, 1, LINE_AA, 0 )
 
+            circle(img,predictPt,10,Scalar(0,255,0));
             //img = Scalar::all(0);
             drawCross( statePt, Scalar(255,0,0), 3 ); //blue
             drawCross( measPt, Scalar(0,0,255), 3 );    //red
@@ -122,7 +182,22 @@ Point2f CKalman(Point2f & point4kalman , Mat & img ,Point2f & oldPoint4Kalman )
         
         //if( code == 27 || code == 'q' || code == 'Q' )
             //break;
-        }
-    circle(img,predictPt,10,Scalar(0,255,0));
-    return predictPt;
+        //}
+
+
+        
+        history_mats[his_flag%2] = img;
+        his_flag++;
+        
+
+        //rectangle(img,roi,Scalar(0,255,0));
+        //history_mat = img(roi);
+        
+        
+        
+    if((abs(predictPt.x - point4kalman.x)>100) || (abs(predictPt.y - point4kalman.y)>50)) return point4kalman  ; 
+    if(predict_count < 8) return point4kalman;
+    if(abs(predictPt.y - point4kalman.y)<10 || abs(predictPt.x - point4kalman.x)<10) return point4kalman;
+    
+    return predictPt    ;
 }

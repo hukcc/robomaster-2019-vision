@@ -15,8 +15,8 @@ namespace autocar
 namespace serial_mul
 {
 
-#define show_serial_listen
-#define show_serial_publish
+//#define show_serial_listen
+//#define show_serial_publish
 
 CLinuxSerial serial(0);
 short Yaw    = 0;
@@ -64,13 +64,13 @@ void publish2car(const vision_mul::armor_pos& pos, short _yaw, short _pitch)
                                    0x00,        // 距离
                                    0xFE};       // 尾
     send_bytes[1] = pos.Flag;     // 标志位
-    send_bytes[6] = pos.angle_z;  // 距离信息
+    send_bytes[6] = pos.angle_z;  // 距离信息 矫正距离×0.8
 //    
     short* data_ptr = (short *)(send_bytes + 2); // 16位指针指向第一个数据
 //
     data_ptr[0] = _yaw   - static_cast<short>(pos.angle_x * 100);
     data_ptr[1] = _pitch - static_cast<short>(pos.angle_y * 100);
-
+    data_ptr[0] = data_ptr[0]*1;
     
 #ifdef show_serial_publish
     

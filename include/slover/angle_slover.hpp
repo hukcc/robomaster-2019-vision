@@ -60,8 +60,8 @@ public:
 class AngleSolver : public RectPnPSolver {
 public:
     AngleSolver(const cv::Mat & camera_matrix, const cv::Mat & dist_coeff,
-                double target_width = 0, double target_height = 0, double z_scale = 1.0,
-                double min_dist = 50.0, double max_dist = 800.0)
+                double target_width = 0, double target_height = 0, double z_scale = 1.0,        //没有导入所以一直是1
+                double min_dist = 10.0, double max_dist = 1100.0)
         : RectPnPSolver(camera_matrix, dist_coeff, target_width, target_height){
         min_distance = min_dist;
         max_distance = max_dist;

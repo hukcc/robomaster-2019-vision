@@ -18,6 +18,7 @@ namespace slover
 #define show_src_rect
 
 int count=2;
+
 const int bullet_speed = 18;     
 const cv::Point ptoffset = cv::Point(22,0); // 子弹的偏移量 offset x → y ↓  
 Point2f predictPoint = Point2f(0,0);
@@ -54,7 +55,8 @@ vision_mul::armor_pos Armor_recorder::SlectFinalArmor(std::vector<vision_mul::ar
         //armor.rect.center = predictPoint; //for predict
         RotatedRect PRrect = RotatedRect(predictPoint,rect.size,rect.angle);
         rect = PRrect;
-        circle(src,rect.center,10,Scalar(0,255,0));
+        dis = rect.size.area();
+        //circle(src,rect.center,10,Scalar(0,255,0));
         //imshow("pre",src);
         if (armor_ratio < 4)
         {
@@ -108,8 +110,22 @@ vision_mul::armor_pos Armor_recorder::SlectFinalArmor(std::vector<vision_mul::ar
     }
    //printf("%lf , %lf       ",armor_vect[0].rect.center.x,armor_vect[0].rect.center.y);
     //printf("%lf , %lf \n",history_armor[(count)%2].rect.center.x,history_armor[(count)%2].rect.center.y);
-    if(predict_flag < 15)   //丢失目标的帧数的上限值
-    predictPoint = CKalman(armor_vect[0].rect.center, src ,history_armor[(count)%2].rect.center);
+
+    //if(goto_count%5==0) 
+
+    
+
+
+    if(predict_flag < 5){   //丢失目标的帧数的上限值
+        predictPoint = CKalman(armor_vect[0].rect.center, src ,history_armor[(count)%2].rect.center,predict_count,dis);
+        predict_count++;
+    }
+    else{
+        predict_count=0;
+    }
+    
+
+
 //   加入对于预测点的结算    
 
     

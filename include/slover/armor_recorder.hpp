@@ -39,10 +39,14 @@ namespace slover
 class Armor_recorder {
 public:
      
-    int  predict_flag;     
+    int  predict_flag;
+    int predict_count;     
+    int dis;
     Armor_recorder(int _history_size = 5): history_size(_history_size) 
     { 
         recorder_time = std::chrono::steady_clock::now();
+        predict_count =0;
+        dis=0;
     }
 
     double point_dist(const cv::Point2f & p1, const cv::Point2f & p2){ return std::sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y)); }

@@ -29,8 +29,8 @@ bool camera_driver::open_camera(cv::VideoCapture & capture_camera_forward , std:
     driver_mul["exposure_time"] >> exposure_time;
 
     capture_camera_forward.set(CV_CAP_PROP_FPS,120);
-//    capture_camera_forward.open(usb_cam_id); // open camera of ptz
-    capture_camera_forward.open(0); // 本机调试用
+    capture_camera_forward.open(usb_cam_id); // open camera of ptz
+    //capture_camera_forward.open(0); // 本机调试用
     if(!capture_camera_forward.isOpened())
     {
         std::cout<<"Cannot open capture_camera_forward!"<<std::endl;

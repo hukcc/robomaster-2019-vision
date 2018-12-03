@@ -73,6 +73,14 @@ slover/kalman.hpp
 /home/robomaster/桌面/AddKalman/src/slover/kalman.cpp
 slover/kalman.hpp
 /home/robomaster/桌面/AddKalman/src/slover/slover/kalman.hpp
+cmath
+-
+vector
+-
+opencv2/opencv.hpp
+-
+opencv2/features2d.hpp
+/home/robomaster/桌面/AddKalman/src/slover/opencv2/features2d.hpp
 
 /usr/local/include/boost/assert.hpp
 boost/config.hpp

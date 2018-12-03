@@ -21,7 +21,7 @@ int main(int argc, char * argv[])
     std::thread task1(&autocar::serial_mul::listen2car);        //只是读串口
     //std::thread task2(&autocar::serial_mul::publish2car);
     task0.join();
-    //task1.join();
+    task1.join();
     //task2.join();
     
 	return EXIT_SUCCESS;
