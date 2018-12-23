@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../lib/libdriver.a  CMakeFiles/driver.dir/camera_driver.cpp.o CMakeFiles/driver.dir/LinuxSerial.cpp.o
+/usr/bin/ranlib ../../lib/libdriver.a
