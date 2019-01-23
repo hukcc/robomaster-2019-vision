@@ -17,7 +17,7 @@ namespace driver
 bool camera_driver::open_camera(cv::VideoCapture & capture_camera_forward , std::string& param_file) // 以后在拓展其他的吧
 {
     camera_mat_file = param_file;
-
+    
     cv::FileStorage fs(param_file, cv::FileStorage::READ);
     if(!fs.isOpened())
         std::cout << "Cannot open [" << param_file <<", please check if the file is exist." << std::endl;
@@ -29,8 +29,8 @@ bool camera_driver::open_camera(cv::VideoCapture & capture_camera_forward , std:
     driver_mul["exposure_time"] >> exposure_time;
 
     capture_camera_forward.set(CV_CAP_PROP_FPS,120);
-    capture_camera_forward.open(usb_cam_id); // open camera of ptz
-    //capture_camera_forward.open(0); // 本机调试用
+//    capture_camera_forward.open(usb_cam_id); // open camera of ptz
+    capture_camera_forward.open(0); // 本机调试用
     if(!capture_camera_forward.isOpened())
     {
         std::cout<<"Cannot open capture_camera_forward!"<<std::endl;
@@ -40,7 +40,7 @@ bool camera_driver::open_camera(cv::VideoCapture & capture_camera_forward , std:
     capture_camera_forward.set(CV_CAP_PROP_FRAME_WIDTH, 640);
     capture_camera_forward.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
     set_camera_exposure(usb_cam_id, exposure_time);
-
+    
     return true;
 }
 

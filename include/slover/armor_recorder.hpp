@@ -51,7 +51,7 @@ public:
 
     double point_dist(const cv::Point2f & p1, const cv::Point2f & p2){ return std::sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y)); }
    
-    vision_mul::armor_pos SlectFinalArmor(std::vector<vision_mul::armor_info> &armors, AngleSolver& angle_slover, AngleSolverFactory& angle_slover_factory,cv::Mat&,int Yawv,int Pitchv);
+    vision_mul::armor_pos SlectFinalArmor(std::vector<vision_mul::armor_info> &armors, AngleSolver& angle_slover, AngleSolverFactory& angle_slover_factory,cv::Mat&);
     void setLastResult(/*vision_mul::armor_info last_armor,*/ vision_mul::armor_pos last_pos, double time)
     {
         if (history_pos.size() < history_size)

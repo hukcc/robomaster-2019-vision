@@ -3,12 +3,11 @@
 #include <vector>
 #include <opencv2/opencv.hpp>
 #include "opencv2/features2d.hpp"
-
 using namespace cv;
 using namespace std;
 
 float history_vx=0;
-
+int his_flag=0;
 Mat history_mat;
 vector<Mat> history_mats(2);
 Mat match_mat(640-3+1,480-3+1,CV_32FC1);
@@ -28,10 +27,54 @@ static inline Point calcPoint(Point2f center, double  x, double  y,int K = 1)
 //float x=250,y=250,vx=1,vy=-1;
 
 
-Point2f CKalman(Point2f & point4kalman , Mat & img ,Point2f & oldPoint4Kalman , int & predict_count , int & dis , int Yawv , int Pitchv)
+Point2f CKalman(Point2f & point4kalman , Mat & img ,Point2f & oldPoint4Kalman , int & predict_count , int & dis)
 {
-    double yawv = Yawv/1000.0;
-    double pitchv = Pitchv/1000.0;
+
+    if(his_flag>1){
+        
+    imshow("img",img);
+    //waitKey(0);
+    Rect roi(319,25,30,30);
+    rectangle(img,roi,Scalar(255,0,0));
+    history_mat = history_mats[(his_flag-1)%2];
+    Mat tempmat = history_mat(roi);
+    imshow("his",history_mat);
+//////////////////////////////////////////////////////////////////////////////////
+    vector<Mat> RGB;
+    split(history_mat,RGB);
+///////////////////////////////////////surf///////////////////////////////////////
+    /*
+    cvtColor(history_mat,history_mat,COLOR_RGB2GRAY);
+    vector<KeyPoint> train_keypoint;
+    Mat train_descriptor;
+    */
+    
+    
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+    matchTemplate(img,tempmat,match_mat,TM_CCOEFF_NORMED);
+    normalize(match_mat,match_mat,0,1,NORM_MINMAX,-1,Mat());
+    
+    cv::minMaxLoc(match_mat,&minv,&maxv,&minpoint,&maxpoint);
+
+    Point2f matchpoint = maxpoint;
+    circle(img,matchpoint,10,Scalar(0,0,255));
+    line(match_mat,matchpoint,Point2f(320,76),Scalar(0,0,255));
+    
+    printf("%lf\n",matchpoint.x-319);
+    imshow("",match_mat);
+    waitKey(0);
+    
+    //FLANN特征点匹配
+    
+    
+    
+    }
+    
     //Mat img(500, 500, CV_8UC3);     //定义背景图像
     
     KalmanFilter KF(4, 2);       //三个参数 1.过程状态向量维度 2.观测向量维度  3.控制向量的维度
@@ -43,14 +86,13 @@ Point2f CKalman(Point2f & point4kalman , Mat & img ,Point2f & oldPoint4Kalman , 
     //初始化运动状态
     float x = point4kalman.x;
     float y = point4kalman.y;
-    float vx = 0*(-(oldPoint4Kalman.x - point4kalman.x)*4450/dis + yawv*0.37);
-    float vy = 0*(-(oldPoint4Kalman.y - point4kalman.y)*4450/dis + pitchv*0.35);
+    float vx = -(oldPoint4Kalman.x - point4kalman.x)*4450/dis;
+    float vy = -(oldPoint4Kalman.y - point4kalman.y)*4450/dis;
 
     state.at<float>(0) = x;
     state.at<float>(1) = y;
-    state.at<float>(2) = vx ;
-    state.at<float>(3) = vy ;
-    printf("%lf %lf \n",vx,vy);
+    state.at<float>(2) = vx;
+    state.at<float>(3) = vy;
 
 
     //for(;;)
@@ -143,14 +185,20 @@ Point2f CKalman(Point2f & point4kalman , Mat & img ,Point2f & oldPoint4Kalman , 
             //break;
         //}
 
+
+        
+        history_mats[his_flag%2] = img;
+        his_flag++;
+        
+
         //rectangle(img,roi,Scalar(0,255,0));
         //history_mat = img(roi);
         
         
         
     if((abs(predictPt.x - point4kalman.x)>100) || (abs(predictPt.y - point4kalman.y)>50)) return point4kalman  ; 
-    if(predict_count < 20) return point4kalman;     //8 predict_count
-    if(abs(predictPt.y - point4kalman.y)<20 || abs(predictPt.x - point4kalman.x)<10) return point4kalman;
+    if(predict_count < 8) return point4kalman;
+    if(abs(predictPt.y - point4kalman.y)<10 || abs(predictPt.x - point4kalman.x)<10) return point4kalman;
     
     return predictPt    ;
 }

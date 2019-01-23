@@ -16,7 +16,7 @@
 int main(int argc, char * argv[])
 {
     autocar::vision_mul::ImageConsProd camera1("../calibration-param/480P_120_RH.xml");
-    
+
     std::thread task0(&autocar::vision_mul::ImageConsProd::ImageConsumer, camera1);
     std::thread task1(&autocar::serial_mul::listen2car);        //只是读串口
     //std::thread task2(&autocar::serial_mul::publish2car);

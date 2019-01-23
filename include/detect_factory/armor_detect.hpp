@@ -36,8 +36,9 @@ public:
     ArmorDetector() {
 		init_armorHist("../config/armor2ev0.jpg", "../config/armor2ev-3.jpg"); // load big armor
 		//注释掉模型装载 否则会报超内存错误
-		svm_big = StatModel::load<SVM>("../config/big_armor_model.yml");
-		svm_small = StatModel::load<SVM>("../config/armor_model.yml");
+		
+		//svm_big = StatModel::load<SVM>("../config/big_armor_model.yml");
+		//svm_small = StatModel::load<SVM>("../config/armor_model.yml");
 	};
     void setPara(const param_mul::armor_param & para) {
         _para = para;

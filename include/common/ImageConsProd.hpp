@@ -65,7 +65,6 @@ public:
     
 public:
     armor_pos armor_pos_;     // 装甲板信息
-    
 private: 
     bool show_image;          // 调试选项
     bool save_result;         // 调试选项

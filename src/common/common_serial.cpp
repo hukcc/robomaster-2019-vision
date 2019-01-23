@@ -15,20 +15,21 @@ namespace autocar
 namespace serial_mul
 {
 
-#define show_serial_listen
-#define show_serial_publish
+//#define show_serial_listen
+//#define show_serial_publish
 
 CLinuxSerial serial(0);
-w_of_ptz ptz_w; //ptz_omiga
+short Yaw    = 0;
+short Pitch  = 0;
 
-int32_t get_yawv() 
+short get_yaw() 
 {
-    int32_t a = ptz_w.Yaw_v;
+    short a = Yaw;
     return a;
 }
-int32_t get_pitchv() 
+short get_pitch() 
 {
-    int32_t b = ptz_w.Pitch_v;
+    short b = Pitch;
     return b;
 }
 
@@ -36,27 +37,21 @@ void listen2car()
 {
     while(1)
     {
-        unsigned char data[10] = {0xDA,
-                               0x00,0x00,  // Yaw_v
-                               0x00,0x00,
-                               0x00,0x00,  //Pitch_v
-                               0x00,0x00,
-                               0xDB};
-        serial.ReadData(data, 10);
+        unsigned char data[7];// = {0xDA,
+                              //   0x00,0x00,  // Yaw
+                              //   0x00,0x00,  // Pitch
+                              //   0xDB};
+        serial.ReadData(data, 7);
         // 这里可能需要一个标志位,告诉我旋转...
-        if (data[0] == 0xDA && data[9] == 0xDB)
+        if (data[0] == 0xDA && data[6] == 0xDB)
         {
-            ptz_w.Yaw_v  = (data[1] << 24) | (data[2] << 16) | (data[3] << 8) | (data[4]);
-            ptz_w.Pitch_v = (data[5] << 24) | (data[6] << 16) | (data[7] << 8) | (data[8]);
-
+            Yaw   = (data[1]<<8) + data[2];
+            Pitch = (data[3]<<8) + data[4];
         }
-
 #ifdef show_serial_listen
-       // std::cout << std::hex <<(int)data[1]<<std::endl;//<<(int)data[2]<<(int)data[3]<<(int)data[4]<<std::endl;
-        std::cout  << "陀螺仪\tYaw_V: "<<  ptz_w.Yaw_v /1000.0 << "\tPitch_V: "<< ptz_w.Pitch_v/1000.0 << std::endl;
+        std::cout << "陀螺仪\tYaw: "<< Yaw/100.0 << "\tPitch: "<< Pitch/100.0 << std::endl;
 #endif
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        //return ptz_w;
     }
 }
 
@@ -68,18 +63,15 @@ void publish2car(const vision_mul::armor_pos& pos, short _yaw, short _pitch)
                                    0x00,0x00,   // Pitch
                                    0x00,        // 距离
                                    0xFE};       // 尾
-    send_bytes[1] = pos.Flag; //debug    // 标志位
-    send_bytes[6] = pos.angle_z;  // 距离信息 
+    send_bytes[1] = pos.Flag;     // 标志位
+    send_bytes[6] = pos.angle_z;  // 距离信息
 //    
     short* data_ptr = (short *)(send_bytes + 2); // 16位指针指向第一个数据
 //
+    data_ptr[0] = _yaw   - static_cast<short>(pos.angle_x * 100);
+    data_ptr[1] = _pitch - static_cast<short>(pos.angle_y * 100);
+    data_ptr[0] = data_ptr[0]*1;
     
-    data_ptr[0] =/* _yaw   - */static_cast<short>(pos.angle_x * 100);
-    data_ptr[1] =/* _pitch - */static_cast<short>(pos.angle_y * 100);  //这边结算不知道为啥反了 Picth轴
-    
-    //2018.12.23 debug
-    //data_ptr[0] = 0 - ptz_w.Yaw_v /1000.0;
-    //data_ptr[1] = 0 - ptz_w.Pitch_v /1000.0;
 #ifdef show_serial_publish
     
     std::cout << "send_data...\t" 
@@ -93,8 +85,8 @@ void publish2car(const vision_mul::armor_pos& pos, short _yaw, short _pitch)
 //              <<(int)send_bytes[6]<<"\t\t"
 //              <<(int)send_bytes[7]<<"\t\t"<<std::endl;
               << pos.Flag  << "\t\t"
-              << _yaw/100.0 <<" - " << pos.angle_x << "\t\t"
-              << _pitch/100.0 <<" - " << pos.angle_y << "\t\t"
+              << Yaw/100.0 <<" - " << pos.angle_x << "\t\t"
+              << Pitch/100.0 <<" - " << pos.angle_y << "\t\t"
               << pos.angle_z << std::endl;
 #endif
 

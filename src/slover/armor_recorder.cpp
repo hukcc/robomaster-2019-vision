@@ -33,7 +33,7 @@ inline bool pos_distance(const vision_mul::armor_pos& pos1, const vision_mul::ar
                       std::abs(pos1.angle_z - last_pos.angle_z))/10;   
 }
 
-vision_mul::armor_pos Armor_recorder::SlectFinalArmor(std::vector<vision_mul::armor_info> &armors, AngleSolver& angle_slover,AngleSolverFactory& angle_slover_factory, cv::Mat & src, int Yawv, int Pitchv) 
+vision_mul::armor_pos Armor_recorder::SlectFinalArmor(std::vector<vision_mul::armor_info> &armors, AngleSolver& angle_slover, AngleSolverFactory& angle_slover_factory, cv::Mat & src) 
 {
     // for perdict
     
@@ -53,9 +53,7 @@ vision_mul::armor_pos Armor_recorder::SlectFinalArmor(std::vector<vision_mul::ar
         //
         //armor.rect = armor.rect + predictPoint - armor.rect.center;
         //armor.rect.center = predictPoint; //for predict
-        RotatedRect PRrect = RotatedRect(predictPoint,rect.size,rect.angle);
-        rect = PRrect;
-        dis = rect.size.area();
+        
         //circle(src,rect.center,10,Scalar(0,255,0));
         //imshow("pre",src);
         if (armor_ratio < 4)
@@ -64,8 +62,8 @@ vision_mul::armor_pos Armor_recorder::SlectFinalArmor(std::vector<vision_mul::ar
             {
                 this->miss_detection_cnt = 0;
                 armor_pos_.Flag = armor.state; // [1 2 3 4]
-                armor_pos_.angle_z = angle_slover._distance;
-                pos_vect.push_back(armor_pos_);
+                //armor_pos_.angle_z = angle_slover._distance;
+                //pos_vect.push_back(armor_pos_);
                 #ifdef show_src_rect
                 armor_vect.push_back(armor);
                 #endif
@@ -80,9 +78,9 @@ vision_mul::armor_pos Armor_recorder::SlectFinalArmor(std::vector<vision_mul::ar
             if (angle_slover_factory.getAngle(rect, AngleSolverFactory::TARGET_ARMOR, armor_pos_.angle_x, armor_pos_.angle_y, bullet_speed, ptoffset ) == true)
             {
                 this->miss_detection_cnt = 0;
-                armor_pos_.Flag = armor.state; // [1 2 3 4]
-                armor_pos_.angle_z = angle_slover._distance;
-                pos_vect.push_back(armor_pos_);
+                //armor_pos_.Flag = armor.state; // [1 2 3 4]
+                //armor_pos_.angle_z = angle_slover._distance;
+                //pos_vect.push_back(armor_pos_);
                 #ifdef show_src_rect
                 armor_vect.push_back(armor);                                    //aemor vect 就是最终装甲的vector
                 #endif
@@ -115,31 +113,24 @@ vision_mul::armor_pos Armor_recorder::SlectFinalArmor(std::vector<vision_mul::ar
 
     
 
-    
+
     if(predict_flag < 5){   //丢失目标的帧数的上限值
-        predictPoint = CKalman(armor_vect[0].rect.center, src ,history_armor[(count)%2].rect.center,predict_count,dis,Yawv,Pitchv);
+        predictPoint = CKalman(armor_vect[0].rect.center, src ,history_armor[(count)%2].rect.center,predict_count,dis);
         predict_count++;
     }
     else{
         predict_count=0;
     }
     
+    RotatedRect PRrect = RotatedRect(predictPoint,armor_vect[0].rect.size,armor_vect[0].rect.angle);
+    dis = PRrect.size.area();
 
+    angle_slover_factory.getAngle(PRrect, AngleSolverFactory::TARGET_SAMLL_ARMOR, armor_pos_.angle_x, armor_pos_.angle_y, bullet_speed, ptoffset );
+    armor_pos_.angle_z = angle_slover._distance;
+    pos_vect.push_back(armor_pos_);
 
 //   加入对于预测点的结算    
-
-    
-
     //waitKey(0);
-
-
-
-
-
-
-
-
-
     if(pos_vect.size())
     {
         double dis_min = 100000000;

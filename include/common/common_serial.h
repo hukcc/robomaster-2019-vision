@@ -13,23 +13,14 @@
 #include <thread> 
 #include "driver/LinuxSerial.hpp"
 #include "detect_factory/armor_info.h"
-class w_of_ptz{
-    public:
-        int32_t Yaw_v   = 0;
-        int32_t Pitch_v  = 0;
-};
+
 namespace autocar
 {
 namespace serial_mul
 {
 
-
-
-
-int32_t get_yawv();
-int32_t get_pitchv();
-
-
+short get_yaw();
+short get_pitch();
 
 void listen2car();
 /**

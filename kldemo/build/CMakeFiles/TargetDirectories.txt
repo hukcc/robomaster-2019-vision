@@ -1,0 +1,3 @@
+/home/hu/下载/AddKalman/kldemo/build/CMakeFiles/edit_cache.dir
+/home/hu/下载/AddKalman/kldemo/build/CMakeFiles/rebuild_cache.dir
+/home/hu/下载/AddKalman/kldemo/build/CMakeFiles/masters.dir

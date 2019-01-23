@@ -64,7 +64,7 @@ void ImageConsProd::ImageConsumer()
 
     // 视频录制(如果打开视频，就不要视频录制)
 #ifndef USE_VIDEO
-    video_recoder recoder("../video", 640, 480);
+    //video_recoder recoder("../video", 640, 480);
 #endif
     cv::Mat frame_forward;
     cv::Mat frame_forward_src;
@@ -83,22 +83,22 @@ void ImageConsProd::ImageConsumer()
         capture_camera_forward >> frame_forward;
         if (save_result) frame_forward.copyTo(frame_forward_src);
 
-        int32_t current_yawv = serial_mul::get_yawv();
-        int32_t current_pitchv = serial_mul::get_pitchv();
+        short current_yaw = serial_mul::get_yaw();
+        short current_pitch = serial_mul::get_pitch();
 
         //std::cout << "vision_mul: " << current_yaw << ", " << current_pitch << std::endl;
 
         if (armor_detector.detect(frame_forward, multi_armors)
             && multi_armors.size())
         {
-            armor_pos_ = armor_recorder.SlectFinalArmor(multi_armors, angle_slover, angle_slover_factory,frame_forward,current_yawv,current_pitchv);
-            serial_mul::publish2car(armor_pos_, current_yawv, current_pitchv);  // 发布消息
+            armor_pos_ = armor_recorder.SlectFinalArmor(multi_armors, angle_slover, angle_slover_factory,frame_forward);
+            serial_mul::publish2car(armor_pos_, current_yaw, current_pitch);  // 发布消息
             armor_recorder.predict_flag=0;
         }
         else{
             armor_recorder.predict_flag++;
             armor_pos_.reset_pos();
-            serial_mul::publish2car(armor_pos_, current_yawv, current_pitchv); 
+            serial_mul::publish2car(armor_pos_, current_yaw, current_pitch); 
         }
 
         if (armor_pos_.Flag)
@@ -116,7 +116,7 @@ void ImageConsProd::ImageConsumer()
             // show center and result
             circle(frame_forward, image_center, 3, CV_RGB(0, 255, 0), 2);  // 在图像中心画一个准心
             char str[30];
-            sprintf(str, "%.2f, %.2f, %.2fcm", armor_pos_.angle_x, armor_pos_.angle_y, armor_pos_.angle_z);    //增加角速度之后angle_y反了
+            sprintf(str, "%.2f, %.2f, %.2fcm", armor_pos_.angle_x, armor_pos_.angle_y, armor_pos_.angle_z);
             putText(frame_forward, str, Point(5, 20), CV_FONT_HERSHEY_COMPLEX_SMALL, 1, CV_RGB(0,205,0), 1);
             try {
                 cvtColor(frame_forward, frame_forward,CV_RGB2GRAY);
@@ -131,8 +131,8 @@ void ImageConsProd::ImageConsumer()
 #ifdef USE_VIDEO
         cv::waitKey(0);  // 暂停用来调试
 #else
-        if(save_result)  // 使用视频不录像
-            recoder.save_frame(frame_forward_src); // 录制
+        //if(save_result)  // 使用视频不录像
+          //  recoder.save_frame(frame_forward_src); // 录制
 #endif
 	}   // end while loop
 }

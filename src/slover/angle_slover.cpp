@@ -70,7 +70,7 @@ bool AngleSolver::getAngle(const cv::RotatedRect & rect, double & angle_x, doubl
 
     if (_distance < min_distance || max_distance < _distance) {
         std::cout << "out of range: [" << min_distance << ", " << max_distance << "] distance: " << _distance << std::endl;
-        // return false;
+        return false;
     }
 
     // translate camera coordinate to PTZ coordinate
@@ -103,7 +103,7 @@ bool AngleSolver::getAngle_rect(const cv::Rect & rect, double & angle_x, double 
     position_in_camera.at<double>(2, 0) = scale_z * position_in_camera.at<double>(2, 0);
     if (position_in_camera.at<double>(2, 0) < min_distance || position_in_camera.at<double>(2, 0) > max_distance){
         std::cout << "out of range: [" << min_distance << ", " << max_distance << "] distance: " << _distance << std::endl;
-        // return false;
+        return false;
     }
 
     // translate camera coordinate to PTZ coordinate
