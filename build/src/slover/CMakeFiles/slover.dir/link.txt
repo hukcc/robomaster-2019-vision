@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../lib/libslover.a  CMakeFiles/slover.dir/angle_slover.cpp.o CMakeFiles/slover.dir/armor_recorder.cpp.o CMakeFiles/slover.dir/kalman.cpp.o
-/usr/bin/ranlib ../../lib/libslover.a

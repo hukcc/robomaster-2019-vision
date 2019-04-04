@@ -1,3 +1,0 @@
-/home/hu/下载/Git_clone/Sentry/extra/armor_sample/build/CMakeFiles/rebuild_cache.dir
-/home/hu/下载/Git_clone/Sentry/extra/armor_sample/build/CMakeFiles/edit_cache.dir
-/home/hu/下载/Git_clone/Sentry/extra/armor_sample/build/CMakeFiles/armor_sample.dir
