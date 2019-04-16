@@ -1,6 +1,7 @@
 <launch>
   <master auto="start"/>
-  <arg name="map" value="icra2019"/>
+  <arg name="map" value="nav3"/>
+  <!-- <param name="serial_port" value="/dev/ttyUSB0" /> -->
 
   <!-- Run the camera node -->
   <node pkg="roborts_camera" type="roborts_camera_node" name="uvc_camera" respawn="false" />
@@ -13,6 +14,10 @@
   <node pkg="roborts_decision" type="armor_detection_client" name="armor_detection_client" respawn="false" />
 
   <!-- Run the robot sdk interface -->
-  <include file="$(find roborts_bringup)/launch/base.launch" />
+  <!-- <include file="$(find roborts_bringup)/launch/base.launch" /> -->
 
+  <!-- Run the serial -->
+  <node pkg="serial" type="serial_read_node"  name="serial_from_car"  output="screen" />
+  <node pkg="serial" type="serial_write_node" name="serial_to_car" output="screen" />
+	
 </launch>

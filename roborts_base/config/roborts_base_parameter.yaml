@@ -1,2 +1,0 @@
-#serial_port : "/dev/serial_sdk"
-serial_port : "/dev/ttyACM0" #self laptop
